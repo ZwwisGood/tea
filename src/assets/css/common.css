@@ -1,0 +1,30 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+.container{
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+section{
+    flex: 1;
+    overflow: scroll;
+}
+footer{
+    position: fixed;
+    bottom: 0;
+}
+ul {
+    list-style: none;
+}
+input{
+    border: none;
+    outline: none;
+    background: none;
+}
+input:focus{
+    border: none;
+}

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        span {
+            margin: 30px 30px;
+            background-color: pink;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <span>我是行内元素</span><span>666</span>
+    </div>
+    <script>
+        /*
+        请写出一个可以生成整型随机数数组（内部元素不重复）的函数，
+        并可以根据参数设置随机数生成的范围和数量。
+        例如：函数makeRandomList(a,b,c)，可以生成 [a,b）范围内，
+        长度为c的随机数数组
+        */
+        // let randomArr = function (min, max, count) {
+        //     let set = new Set()
+        //     while (set.size < count) {
+        //         min = Math.ceil(min)
+        //         max = Math.floor(max)
+        //         let random = Math.floor(Math.random() * (max - min) + min)
+        //         set.add(random)
+        //     }
+        //     return [...set]
+        // }
+        // console.log(randomArr(1, 10, 5));
+
+        // let randomArr1 = function (min, max, count) {
+        //     let res = []
+        //     while (res.length < count) {
+        //         min = Math.ceil(min)
+        //         max = Math.floor(max)
+        //         let random = Math.floor(Math.random() * (max - min) + min)
+        //         if (!res.includes(random)) {
+        //             res.push(random)
+        //         }
+        //     }
+        //     return res
+        // }
+        // console.log(randomArr1(1, 10, 5));
+
+        // let randomArr2 = function (min, max, count) {
+        //     let res = []
+        //     for (i = 0; i <= count - 1; i++) {
+        //         min = Math.ceil(min)
+        //         max = Math.floor(max)
+        //         let random = Math.floor(Math.random() * (max - min) + min)
+        //         if (!res.includes(random)) {
+        //             res.push(random)
+        //         }
+        //     }
+        //     return res
+        // }
+        // console.log(randomArr2(1, 10, 5));
+
+        //数组扁平化
+        // function flatten(arr) {
+        //     const result = []
+        //     arr.forEach(i => {
+        //         if (Array.isArray(i)) result.push(...flatten(i))
+        //         else result.push(i)
+        //     })
+        //     return result
+        // }
+
+        // const problem = [1, 2,[3, 4,[5]],6]
+        // console.log(flatten(problem))
+
+        //
+        // let a = (...rest)=>{
+        //     console.log(...rest);
+        // }
+        // a(1,2,3)
+
+        // for (let i = 0; i < 6; i++) {
+        //     setTimeout(function () {
+        //         console.log(i)
+        //     }, 1000+1000*i)
+        // }
+
+        // let a = null
+        // let b = 0
+        // // console.log(!a);
+        // // console.log(!b);
+        // console.log(typeof b);
+        // if(typeof(b) === "undefined") {
+        //     console.log('b是undefined');
+        // }
+
+        // if(!a && typeof a != "undefined" && a!=0 ) {
+        //     console.log('is null');
+        // }
+
+        function Person(name, height) {
+            console.log(this);
+            this.name = name;
+            this.height = height;
+            this.say = function () {
+                console.log('hello');
+            };
+        }
+        let p = new Person('a','b')
+    </script>
+</body>
+
+</html>

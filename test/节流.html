@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <button class="a">按钮</button>
+    <script>
+        //节流
+        let a = document.querySelector('.a')
+
+        function test(a,b){
+            console.log(this);
+            console.log(a+b);
+        }
+
+        function throttle(func, wait){
+            let prev = 0
+            return function(...args){
+                let _this = this
+                let now = Date.now()
+                console.log(this);
+                if(now - prev >= wait){
+                    func.apply(_this, args)
+                    prev = now
+                }
+            }
+        }
+
+        a.onclick = throttle(function(){
+            test(1,2)
+        }, 1000)
+    </script>
+</body>
+
+</html>
