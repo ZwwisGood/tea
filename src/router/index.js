@@ -106,6 +106,10 @@ const routes = [
         meta: {
             keepAlive: true  //此组件需要缓存
         },
+    },
+    {
+        path: '/payment',
+        component: () => import('../views/Payment'),
     }
 ]
 

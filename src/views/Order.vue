@@ -74,7 +74,7 @@ export default {
       itemList: [], // 选中的商品id号
       address: {}, //选中的地址
       radioPayment: 'ali', //支付方式：默认支付宝
-      order_Id: '', //订单Id
+      order_Id: localStorage.getItem("orderId"), //订单Id
       Total: {
         price: 0, //总价
         num: 0, //总数量
@@ -125,12 +125,14 @@ export default {
                   token: true,
                   'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                //qs是增加安全性的序列化插件
+                //qs是增加安全性的序列化插件(要求如此，比JSON.stringfy安全)
                 data: qs.stringify(dataOrder),
               })
               .then((res) => {
-                // window.open(res)
-                console.log(res)
+                if(res.success){
+                  //打开支付宝支付页面
+                  window.location.href = res.paymentUrl
+                }
               })
           }
         })
@@ -160,7 +162,7 @@ export default {
         .then((res) => {
           //存储订单号到vuex
           this.initOrder(res.data)
-          console.log(res)
+          console.log(res.data)
           this.Total = {
             price: res.data[0].goods_price,
             num: res.data[0].goods_num,

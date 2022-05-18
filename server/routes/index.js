@@ -4,6 +4,11 @@ var connection = require('../db/sql')
 var user = require('../db/userSql')
 var QcloudSms = require("qcloudsms_js");
 let jwt = require('jsonwebtoken')
+//引入支付宝配置文件
+const alipaySdk = require('../db/alipay')
+const AlipayFormData = require('alipay-sdk/lib/form').default
+//引入axios
+const axios = require('axios')
 
 // /* GET home page. */
 // router.get('/', function(req, res, next) {
@@ -1162,8 +1167,78 @@ router.post('/api/submitOrder', function (req, res, next) {
 })
 
 //发起支付
-router.post('/api/submitOrder', function (req, res, next) {
-  
+router.post('/api/payment', function (req, res, next) {
+  //订单号
+  let orderId = req.body.orderId
+  //商品总价
+  let price = req.body.price
+  //购买商品的名称
+  let name = req.body.name
+
+  //开始对接支付宝API
+  const formData = new AlipayFormData()
+  // 调用 setMethod 并传入 get，会返回可以跳转到支付页面的 url
+  formData.setMethod('get')
+  //支付时信息
+  formData.addField('bizContent', {
+    outTradeNo: orderId, //订单号
+    productCode: 'FAST_INSTANT_TRADE_PAY',  //写死
+    totalAmount: price,  //总价
+    subject: name,  //商品名称
+  })
+  //支付成功或失败跳转的链接
+  formData.addField('returnUrl', 'http://localhost:8080/payment');
+  //返回一个promise
+  const result = alipaySdk.exec(
+    'alipay.trade.page.pay',
+    {},
+    { formData: formData },
+  );
+  //对接支付宝成功，支付宝方返回的数据
+  result.then(resp => {
+    res.send({
+      data: {
+        code: 200,
+        success: true,
+        msg: '支付中',
+        paymentUrl: resp
+      }
+    })
+  })
+})
+
+//支付状态
+router.post('/api/paySuccess', function (req, res, next) {
+  //token
+  let token = req.headers.token
+  let tokenObj = jwt.decode(token)
+  //订单号
+  let our_trade_no = req.body.out_trade_no
+  let trade_no = req.body.trade_no
+  //支付宝配置
+  const formData = new AlipayFormData()
+  // 调用 setMethod 并传入 get，会返回可以跳转到支付页面的 url
+  formData.setMethod('get')
+  //支付时信息
+  formData.addField('bizContent', {
+    our_trade_no,
+    trade_no
+  })
+  //返回一个promise
+  const result = alipaySdk.exec(
+    'alipay.trade.query',
+    {},
+    { formData: formData },
+  );
+  //后端请求支付宝
+  result.then(resData=>{
+    axios({
+      method: 'GET',
+      url:resData
+    }).then(data=>{
+      console.log(data);
+    })
+  })
 })
 
 module.exports = router;
