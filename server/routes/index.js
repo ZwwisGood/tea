@@ -10,6 +10,14 @@ const AlipayFormData = require('alipay-sdk/lib/form').default
 //引入axios
 const axios = require('axios')
 
+function isTokenExpired(exp) {
+  let time = parseInt(Date.now() / 1000)
+  console.log(time, exp);
+  if (time > exp) {
+    return true
+  }
+}
+
 // /* GET home page. */
 // router.get('/', function(req, res, next) {
 //   res.render('index', { title: 'Express' });
@@ -635,12 +643,34 @@ router.post('/api/login', function (req, res, next) {
     userTel: req.body.userTel,
     userPwd: req.body.userPwd
   }
+  //每次登录新生成一个token
+  let userTel = params.userTel
+  let userPwd = params.userPwd || '666666'
+  //引入token包
+  let jwt = require('jsonwebtoken')
+  //用户信息
+  let payload = { tel: userTel }
+  //口令
+  let secret = 'zww'
+  //生成token
+  let token = jwt.sign(payload, secret, {
+    expiresIn: 60
+  })
+  console.log('生成的token:', jwt.decode(token), token);
+
   //查询用户手机号是否存在
   connection.query(user.queryUserTel(params), function (error, results) {
     //手机号存在
     if (results.length > 0) {
+      //记录的id
+      let id = results[0].id
+      //把新生成一个token替换旧的token（${token}要加双引号，不能单引号）
+      connection.query(`update user set token = "${token}" where id = ${id}`, function (e, r) {
+        console.log('更换token');
+      })
       connection.query(user.queryUserPwd(params), function (err, result) {
         if (result.length > 0) {
+
           //手机号密码都正确
           res.send({
             code: 200,
@@ -782,7 +812,7 @@ router.post('/api/register', function (req, res, next) {
             code: 200,
             data: {
               success: true,
-              msg: '登录成功',
+              msg: '注册成功',
               data: r[0]
             }
           })
@@ -849,48 +879,59 @@ router.post('/api/addCart', function (req, res, next) {
   //token
   let token = req.headers.token
   let tokenObj = jwt.decode(token)
-  //根据token查询用户信息
-  connection.query(`select * from user where tel = ${tokenObj.tel}`, function (error, results) {
-    //获取用户ID
-    let uId = results[0].id
-    //查询商品信息
-    connection.query(`select * from goods_list where id = ${goodsId}`, function (err, result) {
-      //获取商品的名字、价格、图片
-      let goodsName = result[0].name
-      let goodsPrice = result[0].price
-      let goodsImgUrl = result[0].imgUrl
-      //查询该用户购物车中是否有该商品
-      connection.query(`select * from goods_cart where uId = ${uId} and goods_id = ${goodsId}`, function (e, r) {
-        //已有该商品
-        if (r.length > 0) {
-          //获取商品原来的数量
-          let num = r[0].goods_num
-          connection.query(`update goods_cart set goods_num = ${~~num + 1} where id = ${r[0].id}`, function (ee, rr) {
-            res.send({
-              data: {
-                code: 200,
-                success: true,
-                msg: '添加成功'
-              }
-            })
-          })
-        } else {
-          //没有该商品,将该商品加入到用户的购物车
-          connection.query(`insert into goods_cart (uId,goods_id,goods_name,goods_price,goods_num,goods_imgUrl)
-            values ("${uId}","${goodsId}","${goodsName}","${goodsPrice}","1","${goodsImgUrl}")`, function (eee, rrr) {
-            res.send({
-              data: {
-                code: 200,
-                success: true,
-                msg: '添加成功'
-              }
-            })
-          })
-        }
-      })
-
+  console.log(tokenObj);
+  //判断token是否过期
+  if (isTokenExpired(tokenObj.exp)) {
+    console.log('过期');
+    res.send({
+      data: {
+        code: 1000
+      }
     })
-  })
+  } else {
+    //根据token查询用户信息
+    connection.query(`select * from user where tel = ${tokenObj.tel}`, function (error, results) {
+      //获取用户ID
+      let uId = results[0].id
+      //查询商品信息
+      connection.query(`select * from goods_list where id = ${goodsId}`, function (err, result) {
+        //获取商品的名字、价格、图片
+        let goodsName = result[0].name
+        let goodsPrice = result[0].price
+        let goodsImgUrl = result[0].imgUrl
+        //查询该用户购物车中是否有该商品
+        connection.query(`select * from goods_cart where uId = ${uId} and goods_id = ${goodsId}`, function (e, r) {
+          //已有该商品
+          if (r.length > 0) {
+            //获取商品原来的数量
+            let num = r[0].goods_num
+            connection.query(`update goods_cart set goods_num = ${~~num + 1} where id = ${r[0].id}`, function (ee, rr) {
+              res.send({
+                data: {
+                  code: 200,
+                  success: true,
+                  msg: '添加成功'
+                }
+              })
+            })
+          } else {
+            //没有该商品,将该商品加入到用户的购物车
+            connection.query(`insert into goods_cart (uId,goods_id,goods_name,goods_price,goods_num,goods_imgUrl)
+            values ("${uId}","${goodsId}","${goodsName}","${goodsPrice}","1","${goodsImgUrl}")`, function (eee, rrr) {
+              res.send({
+                data: {
+                  code: 200,
+                  success: true,
+                  msg: '添加成功'
+                }
+              })
+            })
+          }
+        })
+
+      })
+    })
+  }
 })
 
 //查询当前用户的购物车数据
@@ -1231,12 +1272,87 @@ router.post('/api/paySuccess', function (req, res, next) {
     { formData: formData },
   );
   //后端请求支付宝
-  result.then(resData=>{
+  result.then(resData => {
     axios({
       method: 'GET',
-      url:resData
-    }).then(data=>{
-      console.log(data);
+      url: resData
+    }).then(data => {
+      let responseCode = data.data.alipay_trade_query_response
+      if (responseCode.code == '10000') {
+        switch (responseCode.trade_status) {
+          case 'WAIT_BUYER_PAY':
+            res.send({
+              data: {
+                code: 0,
+                msg: '支付宝有交易记录，没付款'
+              }
+            })
+            break
+          case 'TRADE_CLOSED':
+            res.send({
+              data: {
+                code: 1,
+                msg: '交易关闭'
+              }
+            })
+            break
+          case 'TRADE_FINISHED':
+            //根据token查询用户信息，获取id
+            connection.query(`select * from user where tel = ${tokenObj.tel}`, function (error, results) {
+              let uId = results[0].id
+              connection.query(`select * from store_order where uId = ${uId} and order_id = ${our_trade_no}`, function (err, result) {
+                //获取订单的id
+                let id = result[0].id
+                //修改订单状态
+                connection.query(`update store_order set order_status = ${3} where id = ${id}`, function (e, r) {
+
+                })
+              })
+            })
+            res.send({
+              data: {
+                code: 2,
+                msg: '交易完成'
+              }
+            })
+            break
+          case 'TRADE_SUCCESS':
+            //根据token查询用户信息，获取id
+            connection.query(`select * from user where tel = ${tokenObj.tel}`, function (error, results) {
+              let uId = results[0].id
+              connection.query(`select * from store_order where uId = ${uId} and order_id = ${our_trade_no}`, function (err, result) {
+                //获取订单的id
+                let id = result[0].id
+                //修改订单状态
+                connection.query(`update store_order set order_status = ${3} where id = ${id}`, function (e, r) {
+
+                })
+              })
+            })
+            res.send({
+              data: {
+                code: 2,
+                msg: '交易完成'
+              }
+            })
+            break
+        }
+      } else if (responseCode.code == '40004') {
+        res.send({
+          data: {
+            code: 4,
+            msg: '交易不存在'
+          }
+        })
+      }
+    }).catch(err => {
+      res.send({
+        data: {
+          code: 500,
+          msg: '交易失败',
+          err
+        }
+      })
     })
   })
 })

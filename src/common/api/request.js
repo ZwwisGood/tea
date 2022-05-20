@@ -8,7 +8,7 @@ export default {
         method: 'GET',
         data: {},
         params: {},
-        headers:{}
+        headers: {}
     },
     //二次封装axios
     $axios(options = {}) {
@@ -21,16 +21,23 @@ export default {
         // Indicator.open('加载中...')
 
         //判断是否是登录状态
-        if(options.headers.token){
+        if (options.headers.token) {
             //请求头中添加token字段
             options.headers.token = store.state.user.token
-            if(!options.headers.token){
+            if (!options.headers.token) {
                 router.push('/login')
             }
         }
 
         return axios(options).then(v => {
             let data = v.data.data
+            //1000是token过期返回的状态码，token过期重新登录
+            if (data.code == 1000) {
+                localStorage.removeItem('userInfo')
+                store.state.user.userInfo = {}
+                store.state.user.loginStatus = false
+                return router.push('/login')
+            }
             return new Promise((res, rej) => {
                 if (!v) return rej()
                 //关闭加载中

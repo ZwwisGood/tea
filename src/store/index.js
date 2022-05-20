@@ -8,6 +8,7 @@ import cart from './modules/cart.js'
 import address from './modules/address.js'
 import order from './modules/order.js'
 
+
 export default new Vuex.Store({
     modules:{
         user,

@@ -1,8 +1,16 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home'
+import store from '@/store/index'
 
 Vue.use(VueRouter)
+
+//获取原型对象上的push函数
+const originalPush = VueRouter.prototype.push
+//修改原型对象中的push方法
+VueRouter.prototype.push = function push(location) {
+    return originalPush.call(this, location).catch(err => err)
+}
 
 const routes = [
     {
@@ -115,7 +123,32 @@ const routes = [
 
 const router = new VueRouter({
     mode: 'history',
-    routes
+    routes,
+    scrollBehavior(to, from, savedPosition) {
+        // 始终滚动到顶部
+        return { y: 0 }
+    },
+})
+
+router.beforeEach((to, from, next) => {
+    let user = JSON.parse(localStorage.getItem('userInfo'))
+    console.log(user);
+    //已经登录,不能再去登录页
+    // if (user) {
+    //     if (to.path == '/login') {
+    //         next('/home')
+    //     }
+    //     next()
+    // }
+    //没登录
+    if (!user) {
+        if (to.path == '/pay' || to.path == '/payment' || to.path == '/order' || to.path == '/cart' || to.path == '/address') {
+            next('/login')
+        } else {
+            next()
+        }
+    }
+    next()
 })
 
 export default router

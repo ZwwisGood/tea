@@ -19,7 +19,9 @@ const User = {
         //口令
         let secret = 'zww'
         //生成token
-        let token = jwt.sign(payload,secret)
+        let token = jwt.sign(payload,secret,{
+            expiresIn: 30
+        })
 
         return `insert into user (tel,pwd,imgUrl,nickName,token) values (${userTel},${userPwd},'/images/user.jpeg',${userTel},'${token}')`
     }

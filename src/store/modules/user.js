@@ -14,7 +14,7 @@ export default{
             state.loginStatus = true,
             state.token = user.token
             state.userInfo = user
-
+            delete user.pwd
             //持久化存储--本地存储
             localStorage.setItem('userInfo',JSON.stringify(user))
         },
