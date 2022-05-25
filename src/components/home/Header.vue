@@ -1,11 +1,11 @@
 <template>
   <header>
     <h1>
-      <img src="@/assets/images/logo.png" alt="" />
+      <img src="@/assets/images/Logo.jpg" alt="" />
     </h1>
     <div class="search" @click="goSearch">
       <i class="iconfont icon-fangdajing"></i>
-      <span>说点什么吧...</span>
+      <span>搜索一下</span>
     </div>
     <div class="kefu">
       <i class="iconfont icon-kefu"></i>
@@ -42,8 +42,7 @@ header h1 {
   font-size: 0;
 }
 header h1 img {
-  width: 100%;
-  height: 100%;
+width: 110%;
 }
 .search {
   display: flex;

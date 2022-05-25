@@ -14,8 +14,9 @@
           <span>商品评价</span>
         </div>
         <div>
-          
-          <i><router-link to="/home" class="iconfont icon-zhuye"></router-link></i>
+          <i
+            ><router-link to="/home" class="iconfont icon-zhuye"></router-link
+          ></i>
         </div>
       </div>
     </header>
@@ -61,7 +62,7 @@
 import 'swiper/dist/css/swiper.css'
 import { swiper, swiperSlide } from 'vue-awesome-swiper'
 import http from '@/common/api/request'
-import {Toast} from 'mint-ui'
+import { Toast } from 'mint-ui'
 export default {
   data() {
     return {
@@ -103,7 +104,7 @@ export default {
   //如果当前商品id不是已缓存的组件的商品id，重新发送请求
   activated() {
     let id = this.goods.id
-    if(this.$route.query.id != id){
+    if (this.$route.query.id != id) {
       this.getData()
     }
   },
@@ -144,28 +145,30 @@ export default {
       this.$router.back()
     },
     //加入购物车
-    addCart(){
+    addCart() {
       let id = this.$route.query.id
-      http.$axios({
-        method: 'post',
-        url:'/api/addCart',
-        data:{
-          //商品ID
-          goodsId: id,
-        },
-        headers:{
-          //request.js中，判断是否有token
-          token: true,
-        }
-      }).then(res=>{
-        if(res.success){
-          Toast({
-            message: '添加购物车成功',
-            duration: 1500
-          })
-        }
-      })
-    }
+      http
+        .$axios({
+          method: 'post',
+          url: '/api/addCart',
+          data: {
+            //商品ID
+            goodsId: id,
+          },
+          headers: {
+            //request.js中，判断是否有token
+            token: true,
+          },
+        })
+        .then((res) => {
+          if (res.success) {
+            Toast({
+              message: '添加购物车成功',
+              duration: 1500,
+            })
+          }
+        })
+    },
   },
 }
 </script>
@@ -221,8 +224,8 @@ header {
       font-size: 0.64rem;
       padding: 0 0.266667rem;
     }
-    a{
-      margin:0;
+    a {
+      margin: 0;
       padding: 0;
       text-decoration: none;
       font-size: 0.64rem;

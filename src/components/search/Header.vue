@@ -65,7 +65,6 @@ header {
   width: 100%;
   height: 1.173333rem;
   background-color: #b0352f;
-  color: #fff;
 }
 .search-return,
 .search-btn {
@@ -96,6 +95,7 @@ header {
   width: 100%;
   font-size: 0.373333rem;
   padding-top: 0.053333rem;
+  padding-left: 0.16rem;
 }
 .search-btn {
   font-size: 0.426667rem;
