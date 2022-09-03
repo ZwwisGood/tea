@@ -12,7 +12,6 @@ const axios = require('axios')
 
 function isTokenExpired(exp) {
   let time = parseInt(Date.now() / 1000)
-  console.log(time, exp);
   if (time > exp) {
     return true
   }
@@ -879,7 +878,6 @@ router.post('/api/addCart', function (req, res, next) {
   //token
   let token = req.headers.token
   let tokenObj = jwt.decode(token)
-  console.log(tokenObj);
   //判断token是否过期
   if (isTokenExpired(tokenObj.exp)) {
     console.log('过期');

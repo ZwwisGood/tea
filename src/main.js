@@ -35,3 +35,7 @@ new Vue({
   },
   render: h => h(App),
 }).$mount('#app')
+
+window.addEventListener("visibilitychange", function () { //检测浏览器变化，方法执行
+  localStorage.setItem('teaUserId', store.state.user.userInfo.id)
+});

@@ -131,8 +131,8 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    let user = JSON.parse(localStorage.getItem('userInfo'))
-    console.log(user);
+    let id = localStorage.getItem('teaUserId')
+    let user = JSON.parse(localStorage.getItem(`${id}userInfo`))
     //已经登录,不能再去登录页
     // if (user) {
     //     if (to.path == '/login') {

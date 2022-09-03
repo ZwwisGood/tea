@@ -13,6 +13,10 @@
           <i class="iconfont icon-shouye"></i>
           地址管理
         </li>
+        <li @click="goChange" v-if="loginStatus">
+          <i class="iconfont icon-qiehuan"></i>
+          切换账号
+        </li>
         <li @click="logOut(), logOutMsg()" v-if="loginStatus">
           <i class="iconfont icon-tuichu"></i>
           退出登录
@@ -49,7 +53,11 @@ export default {
     //进入地址管理
     goAddress(){
       this.$router.push('/address')
-    }
+    },
+    //切换账号
+    goChange() {
+      this.$router.push('/login')
+    },
   },
   computed: {
     ...mapState({
